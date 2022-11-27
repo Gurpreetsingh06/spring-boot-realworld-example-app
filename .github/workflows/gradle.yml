@@ -57,12 +57,13 @@ jobs:
       - id: matrix
         run: |
           IPS=$(aws --output text --query "Reservations[*].Instances[*].PublicIpAddress" ec2 describe-instances --instance-ids `aws --output text --query "AutoScalingGroups[0].Instances[*].InstanceId" autoscaling describe-auto-scaling-groups --auto-scaling-group-names "terraform-20221127145836504900000001"`)
-         
-          for i in " ${#IPS[@]}"
-          do
-            echo "ip:"
-            echo $i
-          done
+          IFS='' #setting space as delimiter  
+          read -ra ADDR <<<"$IPS" #reading str as an array as tokens separated by IFS  
+
+          for i in "${ADDR[@]}";
+          do  
+            echo "$i"  
+          done  
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
