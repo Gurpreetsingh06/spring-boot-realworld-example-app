@@ -59,16 +59,14 @@ jobs:
       - uses: actions/checkout@master
       - name: Deploy to asg
         run: |
+          echo "${{ secrets.PRIVATE_KEY }}" > key.pem
+          echo "From file:"
+          cat key.pem
+          chmod 400 key.pem
           for i in `aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name terraform-20221127145836504900000001 | grep -i instanceid  | awk '{ print $2}' | cut -d',' -f1| sed -e 's/"//g'`
           do	
             IP=$(aws --output text --query "Reservations[*].Instances[*].PublicIpAddress" ec2 describe-instances --instance-ids $i)
             echo $IP
-            echo "key:"
-            echo "${{ secrets.PRIVATE_KEY }}"
-            echo "${{ secrets.PRIVATE_KEY }}" > key.pem
-            echo "From file:"
-            cat key.pem
-            chmod 400 key.pem
             ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i key.pem ubuntu@$IP "docker stop realworld-app && docker rm realworld-app && docker run --log-driver=awslogs --log-opt awslogs-region=us-east-1 --log-opt awslogs-group=/aws/app/loggroup --name realworld-app -e MYSQL_HOST=${{ secrets.MYSQL_HOST }} -e MYSQL_PORT=3306 -e MYSQL_USER=admin -e MYSQL_PWD=${{ secrets.MYSQL_PWD }} -p 8080:8080 -d spring-boot-realworld-example-app:latest"
           done
         env:
