@@ -65,7 +65,7 @@ jobs:
           do	
             IP=$(aws --output text --query "Reservations[*].Instances[*].PublicIpAddress" ec2 describe-instances --instance-ids $i)
             echo $IP
-            ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i key.pem ubuntu@$IP "docker stop realworld-app && docker rm realworld-app && docker run --log-driver=awslogs --log-opt awslogs-region=us-east-1 --log-opt awslogs-group=/aws/app/loggroup --name realworld-app -e MYSQL_HOST=${{ secrets.MYSQL_HOST }} -e MYSQL_PORT=3306 -e MYSQL_USER=admin -e MYSQL_PWD=${{ secrets.MYSQL_PWD }} -p 8080:8080 -d spring-boot-realworld-example-app:latest"
+            ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i key.pem ubuntu@$IP "docker stop realworld-app && docker rm realworld-app && docker run --log-driver=awslogs --log-opt awslogs-region=us-east-1 --log-opt awslogs-group=/aws/app/loggroup --name realworld-app -e MYSQL_HOST=${{ secrets.MYSQL_HOST }} -e MYSQL_PORT=3306 -e MYSQL_USER=admin -e MYSQL_PWD=${{ secrets.MYSQL_PWD }} -p 8080:8080 -d ${{ secrets.DOCKERHUB_USERNAME }}/spring-boot-realworld-example-app:latest"
           done
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
