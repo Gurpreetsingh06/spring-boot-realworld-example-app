@@ -66,6 +66,7 @@ jobs:
             echo "key:"
             echo "${{ secrets.PRIVATE_KEY }}"
             echo "${{ secrets.PRIVATE_KEY }}" > key.pem
+            echo "From file:"
             cat key.pem
             chmod 400 key.pem
             ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i key.pem ubuntu@$IP "docker stop realworld-app && docker rm realworld-app && docker run --log-driver=awslogs --log-opt awslogs-region=us-east-1 --log-opt awslogs-group=/aws/app/loggroup --name realworld-app -e MYSQL_HOST=${{ secrets.MYSQL_HOST }} -e MYSQL_PORT=3306 -e MYSQL_USER=admin -e MYSQL_PWD=${{ secrets.MYSQL_PWD }} -p 8080:8080 -d spring-boot-realworld-example-app:latest"
