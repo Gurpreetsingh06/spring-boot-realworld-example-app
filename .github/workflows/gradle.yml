@@ -56,12 +56,12 @@ jobs:
     steps:
       - id: matrix
         run: |
-          aws s3 ls
           IPS=$(aws --output text --query "Reservations[*].Instances[*].PublicIpAddress" ec2 describe-instances --instance-ids `aws --output text --query "AutoScalingGroups[0].Instances[*].InstanceId" autoscaling describe-auto-scaling-groups --auto-scaling-group-names "terraform-20221127145836504900000001"`)
           read -a myarray <<< $IPS
           for i in "${myarray[@]}"
           do
-             echo $i
+            echo "ip:"
+            echo $i
           done
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
