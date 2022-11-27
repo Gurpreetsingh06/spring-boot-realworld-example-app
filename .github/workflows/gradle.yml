@@ -58,11 +58,8 @@ jobs:
         run: |
           aws s3 ls
           IPS=$(aws --output text --query "Reservations[*].Instances[*].PublicIpAddress" ec2 describe-instances --instance-ids `aws --output text --query "AutoScalingGroups[0].Instances[*].InstanceId" autoscaling describe-auto-scaling-groups --auto-scaling-group-names "terraform-20221127145836504900000001"`)
-          echo $IPS
           read -a myarray <<< $IPS
-          echo ${myarray[0]}
-          echo ${myarray[1]}
-          echo '::set-output name=value::${myarray[@]}'
+          echo ::set-output name=arr::${myarray[@]}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -70,12 +67,11 @@ jobs:
   build-cli:
     needs: setup
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        value: ${{fromJson(needs.setup.outputs.matrix)}}
     steps:
       - run: |
-          echo "${{ matrix.value }}"
+          echo "$OUTPUT"
+        env:
+          OUTPUT: ${{ steps.matrix.outputs.arr }}
 #   cd-pipeline:
 #     needs: build
 #     name: continuos deploy
