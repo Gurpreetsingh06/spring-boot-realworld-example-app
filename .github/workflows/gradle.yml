@@ -32,6 +32,8 @@ jobs:
           ${{ runner.os }}-gradle-
     - name: Test with Gradle
       run: ./gradlew clean test
+    - name: Build with Gradle
+      run: ./gradlew bootJar
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
     - name: Set up Docker Buildx
@@ -49,23 +51,6 @@ jobs:
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/spring-boot-realworld-example-app:latest
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.matrix.outputs.value }}
-    steps:
-      - id: matrix
-        run: |
-          for i in `aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name terraform-20221127145836504900000001 | grep -i instanceid  | awk '{ print $2}' | cut -d',' -f1| sed -e 's/"//g'`
-          do	
-            echo "IP:"
-            IP=$(aws ec2 describe-instances --instance-ids $i | grep -i PublicIpAddress | awk '{ print $2 }' | head -1 | cut -d"," -f1)
-            echo $IP
-          done
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: 'us-east-1'
   cd-pipeline:
     needs: build
     name: continuos deploy
