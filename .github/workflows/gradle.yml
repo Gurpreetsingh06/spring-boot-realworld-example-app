@@ -63,6 +63,7 @@ jobs:
           do	
             IP=$(aws ec2 describe-instances --instance-ids $i | grep -i PublicIpAddress | awk '{ print $2 }' | head -1 | cut -d"," -f1)
             echo $IP
+            echo "key:"
             echo $PRIVATE_KEY
             echo $PRIVATE_KEY > key.pem
             cat key.pem
