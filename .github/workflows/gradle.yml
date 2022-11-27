@@ -60,7 +60,6 @@ jobs:
           IPS=$(aws --output text --query "Reservations[*].Instances[*].PublicIpAddress" ec2 describe-instances --instance-ids `aws --output text --query "AutoScalingGroups[0].Instances[*].InstanceId" autoscaling describe-auto-scaling-groups --auto-scaling-group-names "terraform-20221127145836504900000001"`)
           echo $IPS
           read -a myarray <<< $IPS
-          echo ${myarray[@]}
           echo ${myarray[0]}
           echo ${myarray[1]}
           echo '::set-output name=value::${myarray[@]}'
