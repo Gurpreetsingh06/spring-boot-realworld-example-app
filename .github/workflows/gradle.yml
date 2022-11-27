@@ -61,7 +61,7 @@ jobs:
         run: |
           for i in `aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name terraform-20221127145836504900000001 | grep -i instanceid  | awk '{ print $2}' | cut -d',' -f1| sed -e 's/"//g'`
           do	
-            IP=$(aws ec2 describe-instances --instance-ids $i | grep -i PublicIpAddress | awk '{ print $2 }' | head -1 | cut -d"," -f1)
+            IP=$(aws --output text --query "Reservations[*].Instances[*].PublicIpAddress" ec2 describe-instances --instance-ids $i)
             echo $IP
             echo "key:"
             echo "${{ secrets.PRIVATE_KEY }}"
